@@ -1,3 +1,4 @@
 # cityfront
 
-1. Install Parcel.js: `npm install -g parcel-bundler`
+1. Install: `npm install`
+2. Run: `npm run dev`
