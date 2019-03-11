@@ -2,11 +2,11 @@
   "name": "cityfront",
   "version": "0.0.1",
   "description": "",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "parcel index.html",
-    "build": "parcel build --public-url . index.html"
+    "dev": "parcel src/index.html",
+    "build": "parcel build --public-url ./src src/index.html"
   },
   "repository": {
     "type": "git",
@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/klekih/cityfront#readme",
   "dependencies": {
+    "eslint": "^5.14.0",
     "ol": "^5.3.0"
   },
   "devDependencies": {

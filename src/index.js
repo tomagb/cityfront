@@ -7,6 +7,8 @@ import LineString from 'ol/geom/LineString'
 import { Vector as VectorLayer } from 'ol/layer';
 import { Vector as VectorSource } from 'ol/source';
 import { Style, Stroke } from 'ol/style'
+import './citySim'
+import startWebsocket from './citySim';
 
 var coords = [
   [
@@ -226,3 +228,5 @@ const map = new Map({
     zoom: 13
   })
 });
+
+startWebsocket()
