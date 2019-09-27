@@ -5,13 +5,14 @@ var startWebsocket = function () {
 
     ws.onopen = function(evt) {
         console.log("OPEN");
+        ws.send("just sent some messageeeee")
     }
     ws.onclose = function(evt) {
         console.log("CLOSE");
         ws = null;
     }
     ws.onmessage = function(evt) {
-        console.log("RESPONSE: " + evt.data);
+        console.log(`RESPONSE: from ${evt.origin}: ${evt.data}`);
     }
     ws.onerror = function(evt) {
         console.log("ERROR: " + evt.data);
