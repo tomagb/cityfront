@@ -198,30 +198,35 @@ var styles = {
   })  
 };
 
-var route = new LineString(coords)
-  .transform('EPSG:4326', 'EPSG:3857');
+function addRoute(coords) {
+  var route = new LineString(coords)
+    .transform('EPSG:4326', 'EPSG:3857');
+    
+  var routeFeature = new Feature({
+      type: 'route',
+      geometry: route
+    });
+    
+    
+  var vectorLayer = new VectorLayer({
+      source: new VectorSource({
+        features: [routeFeature]
+      }),
+      style: function (feature) {
+        return styles[feature.get('type')];
+      }
+    });
 
-var routeFeature = new Feature({
-  type: 'route',
-  geometry: route
-});
-
-var vectorLayer = new VectorLayer({
-  source: new VectorSource({
-    features: [routeFeature]
-  }),
-  style: function (feature) {
-    return styles[feature.get('type')];
-  }
-});
+    let layers = map.getLayers();
+    layers.push(vectorLayer);
+}
 
 const map = new Map({
   target: 'map',
   layers: [
     new TileLayer({
       source: new OSM()
-    }),
-    vectorLayer
+    })    
   ],
   view: new View({
     center: [2627240.17026, 5905051.5256],
@@ -229,4 +234,11 @@ const map = new Map({
   })
 });
 
-startWebsocket()
+function newDataCallback(event) {
+  console.log(event);
+  var eventObj = JSON.parse(event);
+  addRoute(eventObj.coords);
+}
+
+//addRoute(coords);
+startWebsocket(newDataCallback);

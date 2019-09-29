@@ -1,5 +1,5 @@
 
-var startWebsocket = function () {
+var startWebsocket = function (callback) {
 
     var ws = new WebSocket("ws://localhost:9000/city")
 
@@ -13,6 +13,7 @@ var startWebsocket = function () {
     }
     ws.onmessage = function(evt) {
         console.log(`RESPONSE: from ${evt.origin}: ${evt.data}`);
+        callback(evt.data);
     }
     ws.onerror = function(evt) {
         console.log("ERROR: " + evt.data);
