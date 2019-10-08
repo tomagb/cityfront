@@ -12,7 +12,6 @@ var startWebsocket = function (callback) {
         ws = null;
     }
     ws.onmessage = function(evt) {
-        console.log(`RESPONSE: from ${evt.origin}: ${evt.data}`);
         callback(evt.data);
     }
     ws.onerror = function(evt) {
