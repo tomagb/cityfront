@@ -1,5 +1,5 @@
 import 'ol/ol.css';
-import { Map, View } from 'ol';
+import { Map as olMap, View } from 'ol';
 import TileLayer from 'ol/layer/Tile';
 import OSM from 'ol/source/OSM';
 import Feature from 'ol/Feature'
@@ -9,6 +9,11 @@ import { Vector as VectorSource } from 'ol/source';
 import { Style, Stroke } from 'ol/style'
 import './citySim'
 import startWebsocket from './citySim';
+import _ from 'lodash';
+
+// to track the index where a set of coords has been
+// introduced in the map
+var layersMap = new Map();
 
 var styles = {
   'route': new Style({
@@ -16,32 +21,49 @@ var styles = {
       width: 6,
       color: [204, 0, 0, 0.8]
     })
-  })  
+  })
 };
 
 function addRoute(coords) {
+  console.log('add ' + coords);
   var route = new LineString(coords)
     .transform('EPSG:4326', 'EPSG:3857');
-    
-  var routeFeature = new Feature({
-      type: 'route',
-      geometry: route
-    });    
-    
-  var vectorLayer = new VectorLayer({
-      source: new VectorSource({
-        features: [routeFeature]
-      }),
-      style: function (feature) {
-        return styles[feature.get('type')];
-      }
-    });
 
-    let layers = map.getLayers();
-    layers.push(vectorLayer);
+  var routeFeature = new Feature({
+    type: 'route',
+    geometry: route
+  });
+
+  var vectorLayer = new VectorLayer({
+    source: new VectorSource({
+      features: [routeFeature]
+    }),
+    style: function (feature) {
+      return styles[feature.get('type')];
+    }
+  });
+
+  for (var [_, crds] in layersMap) {
+    if (_.isEqual(crds, coords)) {
+      return;
+    }
+  }
+  let layers = map.getLayers();
+  layers.push(vectorLayer);
+  layersMap.set(layers.getLength() - 1, coords);
 }
 
-const map = new Map({
+
+function removeRoute(coords) {
+  console.log('remove ' + coords);
+  let layers = map.getLayers();
+  for (var [index, crds] in layersMap) {
+    if (_.isEqual(crds, coords)) {
+      layers.removeAt(index);
+    }
+  }
+}
+const map = new olMap({
   target: 'map',
   layers: [
     new TileLayer({
@@ -54,22 +76,18 @@ const map = new Map({
   })
 });
 
-function removeRoute(coords) {
-
-}
-
 function newDataCallback(event) {
   var eventObj = JSON.parse(event);
   if (eventObj.coords === null) {
     console.log('null' + event);
     return;
   }
-  if (eventObj.density === 0) {    
+  if (eventObj.density === 0) {
     removeRoute(eventObj.coords);
   }
   else {
     addRoute(eventObj.coords);
-  }  
+  }
 }
 
 //addRoute(coords);
