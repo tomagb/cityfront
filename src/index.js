@@ -1,5 +1,5 @@
 import 'ol/ol.css';
-import { Map, View } from 'ol';
+import { Map as olMap, View } from 'ol';
 import TileLayer from 'ol/layer/Tile';
 import OSM from 'ol/source/OSM';
 import Feature from 'ol/Feature'
@@ -9,6 +9,9 @@ import { Vector as VectorSource } from 'ol/source';
 import { Style, Stroke } from 'ol/style'
 import './citySim'
 import startWebsocket from './citySim';
+import _ from 'lodash'
+
+var arrayOfCoords = new Map();
 
 var styles = {
   'route': new Style({
@@ -39,9 +42,11 @@ function addRoute(coords) {
 
     let layers = map.getLayers();
     layers.push(vectorLayer);
+
+    arrayOfCoords[layers.getLength() - 1, coords];
 }
 
-const map = new Map({
+const map = new olMap({
   target: 'map',
   layers: [
     new TileLayer({
@@ -55,11 +60,20 @@ const map = new Map({
 });
 
 function removeRoute(coords) {
-
+  console.log('smth to remove');
+  for (var [key, value] of arrayOfCoords) {
+    if (_.isEqual(coords, value)) {
+      console.log('found one');
+      let layers = map.getLayers();
+      layers.removeAt(key);
+      arrayOfCoords.removeAt(key);
+    }
+  }
 }
 
 function newDataCallback(event) {
   var eventObj = JSON.parse(event);
+  console.log('got route')
   if (eventObj.coords === null) {
     console.log('null' + event);
     return;
@@ -72,5 +86,4 @@ function newDataCallback(event) {
   }  
 }
 
-//addRoute(coords);
 startWebsocket(newDataCallback);
