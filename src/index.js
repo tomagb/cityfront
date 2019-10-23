@@ -9,11 +9,9 @@ import { Vector as VectorSource } from 'ol/source';
 import { Style, Stroke } from 'ol/style'
 import './citySim'
 import startWebsocket from './citySim';
-import _ from 'lodash';
+import _ from 'lodash'
 
-// to track the index where a set of coords has been
-// introduced in the map
-var layersMap = new Map();
+var arrayOfCoords = new Map();
 
 var styles = {
   'route': new Style({
@@ -43,26 +41,12 @@ function addRoute(coords) {
     }
   });
 
-  for (var [_, crds] in layersMap) {
-    if (_.isEqual(crds, coords)) {
-      return;
-    }
-  }
-  let layers = map.getLayers();
-  layers.push(vectorLayer);
-  layersMap.set(layers.getLength() - 1, coords);
+    let layers = map.getLayers();
+    layers.push(vectorLayer);
+
+    arrayOfCoords[layers.getLength() - 1, coords];
 }
 
-
-function removeRoute(coords) {
-  console.log('remove ' + coords);
-  let layers = map.getLayers();
-  for (var [index, crds] in layersMap) {
-    if (_.isEqual(crds, coords)) {
-      layers.removeAt(index);
-    }
-  }
-}
 const map = new olMap({
   target: 'map',
   layers: [
@@ -76,8 +60,21 @@ const map = new olMap({
   })
 });
 
+function removeRoute(coords) {
+  console.log('smth to remove');
+  for (var [key, value] of arrayOfCoords) {
+    if (_.isEqual(coords, value)) {
+      console.log('found one');
+      let layers = map.getLayers();
+      layers.removeAt(key);
+      arrayOfCoords.removeAt(key);
+    }
+  }
+}
+
 function newDataCallback(event) {
   var eventObj = JSON.parse(event);
+  console.log('got route')
   if (eventObj.coords === null) {
     console.log('null' + event);
     return;
@@ -90,5 +87,4 @@ function newDataCallback(event) {
   }
 }
 
-//addRoute(coords);
 startWebsocket(newDataCallback);
