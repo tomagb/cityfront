@@ -20,7 +20,7 @@
   "homepage": "https://github.com/klekih/cityfront#readme",
   "dependencies": {
     "eslint": "^6.1.0",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.21",
     "ol": "^5.3.3"
   },
   "devDependencies": {
